@@ -1,0 +1,16 @@
+langchain
+chromadb
+transformers
+sentence-transformers
+fastapi
+uvicorn
+pydantic
+langchain-groq
+sqlalchemy
+psycopg2-binary
+pyodbc
+mysql-connector-python
+tqdm
+python-dotenv
+loguru
+pytest
