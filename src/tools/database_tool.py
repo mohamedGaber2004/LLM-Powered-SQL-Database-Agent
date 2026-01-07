@@ -1,15 +1,16 @@
-import os , re
+import re
 import sqlparse
 from dotenv import load_dotenv
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
 from langchain_core.messages import HumanMessage , SystemMessage
 
-from src.Database.database import engine , get_schema
+from src.Database.database import DataBase
+from Config.config import engine 
 from src.LLMs.groq_gpt_oss import LLM
 
-llm = LLM()
-llm = llm.get_llm()
+llm = LLM().get_llm()
+database_schema = DataBase().get_schema()
 
 load_dotenv()
 
@@ -35,7 +36,7 @@ def validate_sql_query(sql_query) :
 
 def generate_sql_query(nl_query):
     """Converts natural language query to an otimized SQL query."""
-    schema = get_schema()
+    schema = database_schema()
 
     schema_text = "\n".join([f"{table}: {','.join(columns)}" for table , columns in schema.items()])
     prompt = f"""
@@ -105,24 +106,3 @@ def execute_query(sql_query) :
     except SQLAlchemyError as e : 
         print(f"Database Execution Error :{str(e)}")
         return None
-    
-
-
-
-if __name__ == "__main__" : 
-    user_input = input("Enter you natural language query: ")
-    sql_query = generate_sql_query(user_input)
-
-    if sql_query : 
-        print(f"\nGenerated SQL Query:\n{sql_query}")
-
-        execution_results = execute_query(sql_query)
-        if execution_results : 
-            for row in execution_results['results'] : 
-                print(row)
-
-        else : 
-            print("No results found")
-
-    else :
-        print("Failed to generate a valid SQL query") 
