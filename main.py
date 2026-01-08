@@ -1,29 +1,18 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-from src.tools.database_tool import generate_sql_query , execute_query
+
+from src.graphs.graph_builder import GraphBuilder
+
 
 app = FastAPI()
-
-class QueryRequest(BaseModel):
-    query : str
+graph = GraphBuilder()
 
 
 @app.post("/generate_sql/")
 def generate_sql(payload: dict):
     prompt = payload["prompt"]
-    sql = generate_sql_query(prompt)
-    return {"sql": sql}
-
-
-
-@app.post("/execute_sql/")
-def execute_sql(payload: dict):
-    query = payload["query"]
-    results, tips = execute_query(query)
-    return {
-        "results": results,
-        "optimization_tips": tips
-    }
+    sql = graph.run(prompt)
+    sql = sql
+    return {"sql_Query": sql}
 
 
 if __name__ == "__main__" : 

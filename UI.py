@@ -16,7 +16,7 @@ if st.button("Generate SQL"):
     )
 
     if response.status_code == 200:
-        sql_query = response.json().get("sql", "Error generating query")
+        sql_query = response.json().get("sql_Query", "Error generating query")
         st.code(sql_query, language="sql")
         st.session_state["generated_sql"] = sql_query
     else:

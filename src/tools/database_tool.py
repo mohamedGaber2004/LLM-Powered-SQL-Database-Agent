@@ -4,10 +4,12 @@ from dotenv import load_dotenv
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
 from langchain_core.messages import HumanMessage , SystemMessage
+from langchain_core.prompts import PromptTemplate , ChatPromptTemplate
 
 from src.Database.database import DataBase
 from Config.config import engine 
 from src.LLMs.groq_gpt_oss import LLM
+from src.prompts.generate_sql_prompt import generate_sql_prompt
 
 llm = LLM().get_llm()
 database_schema = DataBase().get_schema()
@@ -36,23 +38,10 @@ def validate_sql_query(sql_query) :
 
 def generate_sql_query(nl_query):
     """Converts natural language query to an otimized SQL query."""
-    schema = database_schema()
+    schema = database_schema
 
     schema_text = "\n".join([f"{table}: {','.join(columns)}" for table , columns in schema.items()])
-    prompt = f"""
-    You are an SQL expert.Convert the following natural language query into an optimized MySQL query.
-    Ensure : 
-    - Proper use of INDEXING where applicable.
-    - Use of efficient JOINS instead of nasted queries.
-    - Use GROUP BY when aggregation are needed.
-    - Ensure SQL is valid and optimized for execution.
-
-    Database Schema:
-    {schema_text}
-
-    User Request: {nl_query}
-
-    SQL Query:"""
+    prompt = PromptTemplate.from_template(generate_sql_prompt).format(schema_text=schema_text,nl_query=nl_query)
 
     try : 
         response = llm.invoke([

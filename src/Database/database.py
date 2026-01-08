@@ -13,7 +13,7 @@ class DataBase :
             print(f"❌ Error connecting to MySQL: {e}")
 
 
-    def get_schema():
+    def get_schema(self):
         query = """
         SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE
         FROM INFORMATION_SCHEMA.COLUMNS
